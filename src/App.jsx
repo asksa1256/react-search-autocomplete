@@ -8,6 +8,7 @@ function App() {
   const [value, setValue] = useState("");
   const [showAutoCompleteList, setShowAutoCompleteList] = useState(false);
   const [filteredItems, setFilteredItems] = useState([]);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
 
   const handleChange = (e) => {
     setValue(e.target.value);
@@ -25,6 +26,23 @@ function App() {
     console.log(`{ ${itemKey}, ${itemType} }`);
   };
 
+  const handleKeyUp = (e) => {
+    if (e.key === "ArrowDown") {
+      setFocusedIndex((prev) => (prev + 1) % filteredItems.length);
+    }
+
+    if (e.key === "ArrowUp") {
+      setFocusedIndex((prev) =>
+        prev <= 0 ? filteredItems.length - 1 : prev - 1
+      );
+    }
+
+    if (e.key === "Enter") {
+      const selectedItem = filteredItems[focusedIndex];
+      handleListClick(selectedItem.key, selectedItem.type);
+    }
+  };
+
   const debouncedFilter = useMemo(
     () =>
       debounce((inputValue) => {
@@ -38,7 +56,7 @@ function App() {
 
   useEffect(() => {
     handleLoad();
-  }, []);
+  }, [focusedIndex]);
 
   useEffect(() => {
     if (value.trim() === "") {
@@ -50,9 +68,18 @@ function App() {
 
   return (
     <>
-      <input type="text" value={value} onChange={handleChange} />
+      <input
+        type="text"
+        value={value}
+        onChange={handleChange}
+        onKeyUp={handleKeyUp}
+      />
       {showAutoCompleteList && (
-        <AutoCompleteList items={filteredItems} onListClick={handleListClick} />
+        <AutoCompleteList
+          items={filteredItems}
+          onListClick={handleListClick}
+          focusedIndex={focusedIndex}
+        />
       )}
     </>
   );
