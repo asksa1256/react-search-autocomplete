@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { getData } from "./services/api";
 import debounce from "./utils/debounce";
-import AutoCompleteList from "./AutoCompleteList";
+import AutoComplete from "./components/AutoComplete";
 
 function App() {
   const [items, setItems] = useState([]);
@@ -56,7 +56,7 @@ function App() {
 
   useEffect(() => {
     handleLoad();
-  }, [focusedIndex]);
+  }, []);
 
   useEffect(() => {
     if (value.trim() === "") {
@@ -75,8 +75,9 @@ function App() {
         onKeyUp={handleKeyUp}
       />
       {showAutoCompleteList && (
-        <AutoCompleteList
+        <AutoComplete
           items={filteredItems}
+          inputValue={value}
           onListClick={handleListClick}
           focusedIndex={focusedIndex}
         />
